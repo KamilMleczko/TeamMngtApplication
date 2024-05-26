@@ -29,7 +29,7 @@ public class ModulProjektu
     public Projekt? Projekt { get; set; }
     
     [DisplayFormat(NullDisplayText = "Brak")]
-    public Zespol? Zespol { get; set; }
+    public ICollection<Zespol>? Zespoly { get; set; }
     
     [DisplayFormat(NullDisplayText = "Brak")]
     public ICollection<Zadanie>? Zadania { get; set; }
