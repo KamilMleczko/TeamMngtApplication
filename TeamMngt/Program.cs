@@ -1,4 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using TeamMngt.Data;
+
+using System.Globalization;
+
+
+var cultureInfo = CultureInfo.InvariantCulture;
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<TeamMngtContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("TeamMngtContext") ?? throw new InvalidOperationException("Connection string 'TeamMngtContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
