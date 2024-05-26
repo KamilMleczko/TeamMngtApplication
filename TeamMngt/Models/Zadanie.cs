@@ -23,7 +23,7 @@ public class Zadanie
     public String? Opis { get; set; }
     
     [DisplayFormat(NullDisplayText = "Brak")]
-    public Modul? Modul { get; set; }
+    public ModulProjektu? ModulProjektu { get; set; }
     
     [DisplayFormat(NullDisplayText = "Brak")]
     public Pracownik? Pracownik { get; set; }

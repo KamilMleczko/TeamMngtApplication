@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TeamMngt.Models;
 
-public interface Modul
+public interface ModulProjektu
 {
     
     [Key]

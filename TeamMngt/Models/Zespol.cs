@@ -16,15 +16,10 @@ public class Zespol
     public String? Opis { get; set; }
 
     [DisplayFormat(NullDisplayText = "Brak")]
-    public Modul? Modul { get; set; }
+    public ModulProjektu? ModulProjektu { get; set; }
     
     [DisplayFormat(NullDisplayText = "Brak")]
     public ICollection<Pracownik>? Pracownicy { get; set; }
-    
-    [DisplayFormat(NullDisplayText = "Brak")]
-    public Pracownik? Lider { get; set; }
-    
-    
     
     
 }

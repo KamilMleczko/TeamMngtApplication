@@ -26,8 +26,5 @@ public class Projekt
     
     
     [DisplayFormat(NullDisplayText = "Brak")]
-    public Pracownik? Menadzer { get; set; }
-    
-    [DisplayFormat(NullDisplayText = "Brak")]
-    public ICollection<Modul>? Moduly { get; set; }
+    public ICollection<ModulProjektu>? ModulyProjektu { get; set; }
 }
