@@ -163,7 +163,8 @@ namespace TeamMngt.Migrations
                 {
                     b.HasOne("TeamMngt.Models.Projekt", "Projekt")
                         .WithMany("ModulyProjektu")
-                        .HasForeignKey("ProjektId");
+                        .HasForeignKey("ProjektId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Projekt");
                 });
@@ -172,7 +173,8 @@ namespace TeamMngt.Migrations
                 {
                     b.HasOne("TeamMngt.Models.Zespol", "Zespol")
                         .WithMany("Pracownicy")
-                        .HasForeignKey("ZespolId");
+                        .HasForeignKey("ZespolId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Zespol");
                 });
@@ -181,7 +183,8 @@ namespace TeamMngt.Migrations
                 {
                     b.HasOne("TeamMngt.Models.ModulProjektu", "ModulProjektu")
                         .WithMany("Zadania")
-                        .HasForeignKey("ModulProjektuId");
+                        .HasForeignKey("ModulProjektuId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("TeamMngt.Models.Pracownik", "Pracownik")
                         .WithMany("Zadania")
@@ -196,7 +199,8 @@ namespace TeamMngt.Migrations
                 {
                     b.HasOne("TeamMngt.Models.ModulProjektu", "ModulProjektu")
                         .WithMany("Zespoly")
-                        .HasForeignKey("ModulProjektuId");
+                        .HasForeignKey("ModulProjektuId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ModulProjektu");
                 });
