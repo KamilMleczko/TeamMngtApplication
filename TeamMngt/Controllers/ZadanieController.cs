@@ -22,7 +22,11 @@ namespace TeamMngt.Controllers
         // GET: Zadanie
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Zadanie.ToListAsync());
+            var prac = _context.Zadanie
+                .Include(p => p.ModulProjektu)
+                .Include(p => p.Pracownik)
+                .AsNoTracking();
+            return View(await prac.ToListAsync());
         }
 
         // GET: Zadanie/Details/5
@@ -34,6 +38,8 @@ namespace TeamMngt.Controllers
             }
 
             var zadanie = await _context.Zadanie
+                .Include(p => p.ModulProjektu)
+                .Include(p => p.Pracownik)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (zadanie == null)
             {
@@ -42,22 +48,66 @@ namespace TeamMngt.Controllers
 
             return View(zadanie);
         }
+        
+        private void PopulatePracownicyDropDownList(object selectedPracownik = null)
+        {
+            var wybraniPracownicy = from e in _context.Pracownik
+                orderby e.Nazwisko, e.Imie
+                select new { Id = e.Id, NazwiskoImie = e.Nazwisko + " " + e.Imie };
+            var res = wybraniPracownicy.AsNoTracking();
+            ViewBag.PracownicyID = new SelectList(res, "Id", "NazwiskoImie", selectedPracownik);
+        }
+
+        private void PopulateModulyProjektuDropDownList(object selectedModul = null)
+        {
+            var wybraneModuly = from e in _context.ModulProjektu
+                orderby e.Nazwa
+                select e;
+            var res = wybraneModuly.AsNoTracking();
+            ViewBag.ModulyID = new SelectList(res, "Id", "Nazwa", selectedModul);
+        }
 
         // GET: Zadanie/Create
         public IActionResult Create()
         {
+            PopulatePracownicyDropDownList();
+            PopulateModulyProjektuDropDownList();
             return View();
         }
 
+        
+        
         // POST: Zadanie/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nazwa,CzasWykonania,Deadline,Opis")] Zadanie zadanie)
+        public async Task<IActionResult> Create([Bind("Id,Nazwa,CzasWykonania,Deadline,Opis")] Zadanie zadanie, IFormCollection form)
         {
+            string pracownikValue = form["Pracownik"].ToString();
+            string modulValue = form["ModulProjektu"].ToString();
+            
             if (ModelState.IsValid)
             {
+                Pracownik pracownik = null;
+                if (pracownikValue != "-1")
+                {
+                    var ee = _context.Pracownik.Where(e => e.Id == int.Parse(pracownikValue));
+                    if (ee.Count() > 0)
+                        pracownik = ee.First();
+                }
+                
+                ModulProjektu modulProjektu = null;
+                if (pracownikValue != "-1")
+                {
+                    var ee = _context.ModulProjektu.Where(e => e.Id == int.Parse(modulValue));
+                    if (ee.Count() > 0)
+                        modulProjektu = ee.First();
+                }
+                
+                zadanie.Pracownik = pracownik;
+                zadanie.ModulProjektu = modulProjektu;
+                
                 _context.Add(zadanie);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -73,11 +123,33 @@ namespace TeamMngt.Controllers
                 return NotFound();
             }
 
-            var zadanie = await _context.Zadanie.FindAsync(id);
+            var zadanie = _context.Zadanie
+                .Where(p => p.Id == id)
+                .Include(p => p.Pracownik)
+                .Include(p => p.ModulProjektu)
+                .First();
             if (zadanie == null)
             {
                 return NotFound();
             }
+            
+            if (zadanie.Pracownik != null)
+            {
+                PopulatePracownicyDropDownList(zadanie.Pracownik.Id);
+            }
+            else
+            {
+                PopulatePracownicyDropDownList();
+            }
+            if (zadanie.ModulProjektu != null)
+            {
+                PopulateModulyProjektuDropDownList(zadanie.ModulProjektu.Id);
+            }
+            else
+            {
+                PopulateModulyProjektuDropDownList();
+            }
+
             return View(zadanie);
         }
 
@@ -86,7 +158,7 @@ namespace TeamMngt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nazwa,CzasWykonania,Deadline,Opis")] Zadanie zadanie)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nazwa,CzasWykonania,Deadline,Opis")] Zadanie zadanie,IFormCollection form)
         {
             if (id != zadanie.Id)
             {
@@ -97,7 +169,36 @@ namespace TeamMngt.Controllers
             {
                 try
                 {
-                    _context.Update(zadanie);
+                    String pracownikValue = form["Pracownik"].ToString();
+                    String modulValue = form["ModulProjektu"].ToString();
+
+                    Pracownik pracownik = null;
+                    if (pracownikValue != "-1")
+                    {
+                        var ee = _context.Pracownik.Where(e => e.Id == int.Parse(pracownikValue));
+                        if (ee.Count() > 0)
+                            pracownik = ee.First();
+                    }
+                    ModulProjektu modulProjektu = null;
+                    if (pracownikValue != "-1")
+                    {
+                        var ee = _context.ModulProjektu.Where(e => e.Id == int.Parse(modulValue));
+                        if (ee.Count() > 0)
+                            modulProjektu = ee.First();
+                    }
+                    zadanie.Pracownik = pracownik;
+                    zadanie.ModulProjektu = modulProjektu;
+                    //_context.Update(zadanie);
+                    Zadanie pp = _context.Zadanie.Where(p => p.Id == id)
+                        .Include(p => p.Pracownik)
+                        .Include(p => p.ModulProjektu)
+                        .First();
+                    pp.Pracownik = pracownik;
+                    pp.ModulProjektu = modulProjektu;
+                    pp.Nazwa = zadanie.Nazwa;
+                    pp.CzasWykonania = zadanie.CzasWykonania;
+                    pp.Deadline = zadanie.Deadline;
+                    pp.Opis = zadanie.Opis;
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -124,8 +225,11 @@ namespace TeamMngt.Controllers
                 return NotFound();
             }
 
-            var zadanie = await _context.Zadanie
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var zadanie =_context.Zadanie
+                .Where(p => p.Id == id)
+                .Include(p => p.Pracownik)
+                .Include(p => p.ModulProjektu)
+                .First();
             if (zadanie == null)
             {
                 return NotFound();

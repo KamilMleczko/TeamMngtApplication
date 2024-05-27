@@ -22,7 +22,11 @@ namespace TeamMngt.Controllers
         // GET: Pracownik
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Pracownik.ToListAsync());
+            var prac = _context.Pracownik
+                .Include(p => p.Zadania)
+                .Include(p => p.Zespol)
+                .AsNoTracking();
+            return View(await prac.ToListAsync());
         }
 
         // GET: Pracownik/Details/5
@@ -34,6 +38,8 @@ namespace TeamMngt.Controllers
             }
 
             var pracownik = await _context.Pracownik
+                .Include(p => p.Zadania)
+                .Include(p => p.Zespol)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pracownik == null)
             {
@@ -42,10 +48,21 @@ namespace TeamMngt.Controllers
 
             return View(pracownik);
         }
+        
+        private void PopulateZespolyDropDownList(object selectedZespol = null)
+        {
+            var wybraneZespoly = from e in _context.Zespol
+                orderby e.Nazwa
+                select e;
+            var res = wybraneZespoly.AsNoTracking();
+            ViewBag.ZespolyID = new SelectList(res, "Id", "Nazwa", selectedZespol);
+        }
+
 
         // GET: Pracownik/Create
         public IActionResult Create()
         {
+            PopulateZespolyDropDownList();
             return View();
         }
 
@@ -54,10 +71,20 @@ namespace TeamMngt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,Stanowsiko,Email")] Pracownik pracownik)
+        public async Task<IActionResult> Create([Bind("Id,Imie,Nazwisko,Stanowsiko,Email")] Pracownik pracownik,  IFormCollection form)
         {
+            string zespolValue = form["Zespol"].ToString();
             if (ModelState.IsValid)
             {
+                Zespol zespol = null;
+                if (zespolValue != "-1")
+                {
+                    var ee = _context.Zespol.Where(e => e.Id == int.Parse(zespolValue));
+                    if (ee.Count() > 0)
+                        zespol = ee.First();
+                }
+                pracownik.Zespol = zespol;
+                
                 _context.Add(pracownik);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -73,10 +100,22 @@ namespace TeamMngt.Controllers
                 return NotFound();
             }
 
-            var pracownik = await _context.Pracownik.FindAsync(id);
+            var pracownik =_context.Pracownik
+                .Where(p => p.Id == id)
+                .Include(p => p.Zadania)
+                .Include(p => p.Zespol)
+                .First();
             if (pracownik == null)
             {
                 return NotFound();
+            }
+            if (pracownik.Zespol != null)
+            {
+                PopulateZespolyDropDownList(pracownik.Zespol.Id);
+            }
+            else
+            {
+                PopulateZespolyDropDownList();
             }
             return View(pracownik);
         }
@@ -86,7 +125,7 @@ namespace TeamMngt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,Stanowsiko,Email")] Pracownik pracownik)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Imie,Nazwisko,Stanowsiko,Email")] Pracownik pracownik, IFormCollection form)
         {
             if (id != pracownik.Id)
             {
@@ -97,7 +136,26 @@ namespace TeamMngt.Controllers
             {
                 try
                 {
-                    _context.Update(pracownik);
+                    String zespolValue = form["Zespol"].ToString();
+                    Zespol zespol = null;
+                    if (zespolValue != "-1")
+                    {
+                        var ee = _context.Zespol
+                            .Where(e => e.Id == int.Parse(zespolValue));
+                        if (ee.Count() > 0)
+                            zespol = ee.First();
+                    }
+                    pracownik.Zespol = zespol;
+
+                    Pracownik pp = _context.Pracownik.Where(p => p.Id == id)
+                        .Include(p => p.Zespol)
+                        .First();
+                    pp.Zespol = zespol;
+                    pp.Imie = pracownik.Imie;
+                    pp.Nazwisko = pracownik.Nazwisko;
+                    pp.Stanowsiko= pracownik.Stanowsiko;
+                    pp.Email= pracownik.Email;
+                    //_context.Update(pracownik);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -124,8 +182,11 @@ namespace TeamMngt.Controllers
                 return NotFound();
             }
 
-            var pracownik = await _context.Pracownik
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var pracownik =_context.Pracownik
+                .Where(p => p.Id == id)
+                .Include(p => p.Zadania)
+                .Include(p => p.Zespol)
+                .First();
             if (pracownik == null)
             {
                 return NotFound();

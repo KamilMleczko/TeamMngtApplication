@@ -22,7 +22,11 @@ namespace TeamMngt.Controllers
         // GET: Zespol
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Zespol.ToListAsync());
+            var zes = _context.Zespol
+                .Include(p => p.ModulProjektu)
+                .Include(p => p.Pracownicy)
+                .AsNoTracking();
+            return View(await zes.ToListAsync());
         }
 
         // GET: Zespol/Details/5
@@ -34,6 +38,8 @@ namespace TeamMngt.Controllers
             }
 
             var zespol = await _context.Zespol
+                .Include(p => p.ModulProjektu)
+                .Include(p => p.Pracownicy)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (zespol == null)
             {
@@ -43,21 +49,42 @@ namespace TeamMngt.Controllers
             return View(zespol);
         }
 
+        private void PopulateModulDropDownList(object selectedModul = null)
+        {
+            var wybraneModuly= from e in _context.ModulProjektu
+                orderby e.Nazwa
+                select e;
+            var res = wybraneModuly.AsNoTracking();
+            ViewBag.ModulyID = new SelectList(res, "Id", "Nazwa", selectedModul);
+        }
+        
         // GET: Zespol/Create
         public IActionResult Create()
         {
+            PopulateModulDropDownList();
             return View();
         }
-
+        
         // POST: Zespol/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nazwa,Opis")] Zespol zespol)
+        public async Task<IActionResult> Create([Bind("Id,Nazwa,Opis")] Zespol zespol,  IFormCollection form)
         {
+            string modulValue = form["ModulProjektu"].ToString();
             if (ModelState.IsValid)
             {
+                ModulProjektu modulProjektu = null;
+                if (modulValue != "-1")
+                {
+                    var ee = _context.ModulProjektu.Where(e => e.Id == int.Parse(modulValue));
+                    if (ee.Count() > 0)
+                        modulProjektu = ee.First();
+                }
+
+                zespol.ModulProjektu = modulProjektu;
+                
                 _context.Add(zespol);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -73,10 +100,22 @@ namespace TeamMngt.Controllers
                 return NotFound();
             }
 
-            var zespol = await _context.Zespol.FindAsync(id);
+            var zespol = _context.Zespol
+                .Where(p => p.Id == id)
+                .Include(p => p.ModulProjektu)
+                .First();
+
             if (zespol == null)
             {
                 return NotFound();
+            }
+            if (zespol.ModulProjektu != null)
+            {
+                PopulateModulDropDownList(zespol.ModulProjektu.Id);
+            }
+            else
+            {
+                PopulateModulDropDownList();
             }
             return View(zespol);
         }
@@ -86,7 +125,7 @@ namespace TeamMngt.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nazwa,Opis")] Zespol zespol)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nazwa,Opis")] Zespol zespol,IFormCollection form)
         {
             if (id != zespol.Id)
             {
@@ -97,7 +136,25 @@ namespace TeamMngt.Controllers
             {
                 try
                 {
-                    _context.Update(zespol);
+                    String modulValue = form["ModulProjektu"].ToString();
+                    
+                    ModulProjektu modulProjektu = null;
+                    if (modulValue != "-1")
+                    {
+                        var ee = _context.ModulProjektu.Where(e => e.Id == int.Parse(modulValue));
+                        if (ee.Count() > 0)
+                            modulProjektu = ee.First();
+                    }
+
+                    zespol.ModulProjektu = modulProjektu;
+                    Zespol pp = _context.Zespol
+                        .Where(p => p.Id == id)
+                        .Include(p => p.ModulProjektu)
+                        .First();
+                    pp.ModulProjektu = modulProjektu;
+                    pp.Nazwa = zespol.Nazwa;
+                    pp.Opis = zespol.Opis;
+                    //_context.Update(zespol);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

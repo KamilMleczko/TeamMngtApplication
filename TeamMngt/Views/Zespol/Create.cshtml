@@ -22,6 +22,15 @@
                 <input asp-for="Opis" class="form-control" />
                 <span asp-validation-for="Opis" class="text-danger"></span>
             </div>
+            
+            <div class="form-group">
+                <label asp-for="ModulProjektu" class="control-label"></label>
+                <select asp-for="ModulProjektu" class="form-control" asp-items="ViewBag.ModulyID">
+                    <option value="-1">-- Wybierz moduł nad którym będzie pracował zespół --</option>
+                </select>
+                <span asp-validation-for="ModulProjektu" class="text-danger"></span>
+            </div>
+            
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
