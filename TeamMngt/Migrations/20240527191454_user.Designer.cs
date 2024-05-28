@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamMngt.Data;
 
@@ -10,9 +11,11 @@ using TeamMngt.Data;
 namespace TeamMngt.Migrations
 {
     [DbContext(typeof(TeamMngtContext))]
-    partial class TeamMngtContextModelSnapshot : ModelSnapshot
+    [Migration("20240527191454_user")]
+    partial class user
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.5");

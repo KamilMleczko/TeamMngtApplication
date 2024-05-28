@@ -13,14 +13,34 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    
     public IActionResult Index()
     {
-        return View();
+        if (HttpContext.Session.Keys.Contains("nazwa"))
+        {
+            ViewData["nazwa"] = "Zalogowano: " + HttpContext.Session.GetString("nazwa");
+            return View();
+        }
+        else
+        {
+            ViewData["nazwa"] = "Jesteś niezalogowany"; 
+            return View();
+        }
     }
+    
 
     public IActionResult Privacy()
     {
-        return View();
+        if (HttpContext.Session.Keys.Contains("nazwa"))
+        {
+            ViewData["nazwa"] = "Zalogowano: " + HttpContext.Session.GetString("nazwa");
+            return View();
+        }
+        else
+        {
+            ViewData["nazwa"] = "Jesteś niezalogowany"; 
+            return View();
+        }
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

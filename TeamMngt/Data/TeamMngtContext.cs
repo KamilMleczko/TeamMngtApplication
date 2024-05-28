@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TeamMngt.Models;
+using TeamMngt.MoreClasses;
 
 namespace TeamMngt.Data
 {
@@ -68,5 +69,6 @@ namespace TeamMngt.Data
             });
             
         }
+        public DbSet<TeamMngt.Models.User> User { get; set; } = default!;
     }
 }

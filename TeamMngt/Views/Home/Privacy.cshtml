@@ -1,6 +1,14 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
 }
+@ViewData["nazwa"]
+@if (ViewData["nazwa"] != null && ViewData["nazwa"].ToString().StartsWith("Zalogowano"))
+{
+    <a asp-action="Logout" asp-controller="User">Wyloguj się</a>
+}
+else{
+     <a asp-action="WczytajFormularz" asp-controller="User">Zaloguj się</a>
+}
 <h1>@ViewData["Title"]</h1>
 
 <p>Use this page to detail your site's privacy policy.</p>

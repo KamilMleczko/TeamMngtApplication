@@ -1,7 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@ViewData["nazwa"]
+@if (ViewData["nazwa"] != null && ViewData["nazwa"].ToString().StartsWith("Zalogowano"))
+{
+    
+    <a asp-action="Logout" asp-controller="User">Wyloguj się</a>
+}
+else{
+     <a asp-action="WczytajFormularz" asp-controller="User">Zaloguj się</a>
+}
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
