@@ -28,3 +28,29 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+<h4></h4>
+<h4>Pracownicy należący do Zespołu:</h4>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Imie</th>
+        <th>Nazwisko</th>
+        <th>Stanowsiko</th>
+        <th>Email</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var zadanie in Model.Pracownicy)
+    {
+        <tr>
+            <td>@zadanie.Imie</td>
+            <td>@zadanie.Nazwisko</td>
+            <td>@zadanie.Stanowsiko</td>
+            <td>@zadanie.Email</td>
+        </tr>
+    }
+    </tbody>
+</table>
+

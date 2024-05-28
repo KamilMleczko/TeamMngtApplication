@@ -1,4 +1,4 @@
-@model IEnumerable<TeamMngt.Models.Pracownik>
+@model IEnumerable<TeamMngt.MoreClasses.PracownikDetailsViewModel> 
 
 @{
     ViewData["Title"] = "Index";
@@ -9,45 +9,61 @@
 <p>
     <a asp-action="Create">Dodaj nowego pracownika</a>
 </p>
-<table class="table">
-    <thead>
+
+@foreach (var zespolGroup in Model.GroupBy(m => m.Pracownik.Zespol?.Nazwa?? "!Brak!")
+              .OrderBy(g => g.Key ))
+{
+    
+    <h2>Przypisany zespół: @zespolGroup.Key</h2>  <table class="table">
+        <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Imie)
+                @Html.DisplayNameFor(model => model.Pracownik.Nazwisko)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Nazwisko)
+                @Html.DisplayNameFor(model => model.Pracownik.Imie)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Stanowsiko)
+                @Html.DisplayNameFor(model => model.Pracownik.Stanowsiko)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.Pracownik.Email)
             </th>
+            <th>
+                Łączna ilosc zajętych godzin pracy
+            </th>
+            
             <th></th>
         </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Imie)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nazwisko)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stanowsiko)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in zespolGroup)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pracownik.Nazwisko)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pracownik.Imie)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pracownik.Stanowsiko)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Pracownik.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ŁącznyCzasWykonania)
+                </td>
+                
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Pracownik.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Pracownik.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Pracownik.Id">Delete</a>
+                </td>
+
+            </tr>
+        }
+        </tbody>
+    </table>
 }
-    </tbody>
-</table>

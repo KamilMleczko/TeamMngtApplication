@@ -1,4 +1,5 @@
-@model IEnumerable<TeamMngt.Models.Projekt>
+
+@model IEnumerable<TeamMngt.MoreClasses.ProjektDetailsViewModel>  
 
 @{
     ViewData["Title"] = "Index";
@@ -11,43 +12,50 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nazwa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataRozpoczecia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Deadline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Opis)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Projekt.Nazwa)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Projekt.DataRozpoczecia)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Projekt.Deadline )
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Projekt.Opis)
+        </th>
+        <th>
+            Godziny robocze przewidziane na Projekt
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var projekt in Model)  
+    {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Nazwa)
+                @projekt.Projekt.Nazwa
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DataRozpoczecia)
+                @projekt.Projekt.DataRozpoczecia 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Deadline)
+                @projekt.Projekt.Deadline 
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Opis)
+                @projekt.Projekt.Opis 
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @projekt.ŁącznyCzasWykonania 
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@projekt.Projekt.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@projekt.Projekt.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@projekt.Projekt.Id">Delete</a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>

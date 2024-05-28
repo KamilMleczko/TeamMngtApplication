@@ -40,3 +40,26 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+<h4></h4>
+<h4>Moduły należące do projektu:</h4>
+<table class="table">
+        <thead>
+            <tr>
+                <th>Nazwa</th>
+                <th>Data Rozpoczęcia</th>
+                <th>Deadline</th>
+                <th>Opis</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var modul in Model.ModulyProjektu)
+        {
+            <tr>
+                <td>@modul.Nazwa</td>
+                <td>@modul.DataRozpoczecia.ToString()</td>  
+                <td>@modul.Deadline.ToString()</td>
+                <td>@modul.Opis</td>
+            </tr>
+        }
+        </tbody>
+        </table>

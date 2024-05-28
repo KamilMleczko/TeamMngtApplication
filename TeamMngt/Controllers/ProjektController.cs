@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TeamMngt.Data;
 using TeamMngt.Models;
+using TeamMngt.MoreClasses;
 
 namespace TeamMngt.Controllers
 {
@@ -19,13 +20,28 @@ namespace TeamMngt.Controllers
             _context = context;
         }
 
+        
+        
         // GET: Projekt
         public async Task<IActionResult> Index()
         {
-            var proj = _context.Projekt
-                .Include(pr => pr.ModulyProjektu)
-                .AsNoTracking();
-            return View(await proj.ToListAsync());
+            //var proj = _context.Projekt
+           //     .Include(pr => pr.ModulyProjektu)
+           //     .AsNoTracking();
+           // return View(await proj.ToListAsync());
+           var projekty = await _context.Projekt
+               .Include(pr => pr.ModulyProjektu)  // Include ModulyProjektu
+               .ThenInclude(m => m.Zadania)     // Include nested Zadania
+               .Select(p => new ProjektDetailsViewModel  // Use view model
+               {
+                   Projekt = p,
+                   ŁącznyCzasWykonania = p.ModulyProjektu.Sum(m => (double)m.Zadania.Sum(z => (double)z.CzasWykonania))
+               })
+               .OrderBy(p => p.Projekt.Deadline)
+               .ThenBy(p => p.ŁącznyCzasWykonania)
+               .ToListAsync();
+
+           return View(projekty);
         }
 
         // GET: Projekt/Details/5
@@ -38,6 +54,8 @@ namespace TeamMngt.Controllers
 
             var projekt = await _context.Projekt
                 .Include(pr => pr.ModulyProjektu)
+                .OrderBy(z => z.Deadline)
+                .ThenBy(z=> z.Nazwa)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (projekt == null)
             {

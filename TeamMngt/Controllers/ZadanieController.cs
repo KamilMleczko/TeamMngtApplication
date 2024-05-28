@@ -25,6 +25,8 @@ namespace TeamMngt.Controllers
             var prac = _context.Zadanie
                 .Include(p => p.ModulProjektu)
                 .Include(p => p.Pracownik)
+                .OrderBy(p => p.Deadline)
+                .ThenBy(p => (double)p.CzasWykonania)
                 .AsNoTracking();
             return View(await prac.ToListAsync());
         }

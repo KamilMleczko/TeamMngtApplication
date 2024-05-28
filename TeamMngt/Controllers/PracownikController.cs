@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using TeamMngt.Data;
 using TeamMngt.Models;
+using TeamMngt.MoreClasses;
 
 namespace TeamMngt.Controllers
 {
@@ -22,11 +23,19 @@ namespace TeamMngt.Controllers
         // GET: Pracownik
         public async Task<IActionResult> Index()
         {
-            var prac = _context.Pracownik
+            var prac = await _context.Pracownik
                 .Include(p => p.Zadania)
                 .Include(p => p.Zespol)
-                .AsNoTracking();
-            return View(await prac.ToListAsync());
+                .Select(p => new PracownikDetailsViewModel  
+                {
+                    Pracownik = p,
+                    ŁącznyCzasWykonania = p.Zadania.Sum(z => (double)z.CzasWykonania)
+                })
+                .OrderBy(p => p.ŁącznyCzasWykonania)
+                .ThenBy(p=>p.Pracownik.Nazwisko)
+                .ToListAsync();
+            
+            return View(prac);
         }
 
         // GET: Pracownik/Details/5
@@ -38,7 +47,7 @@ namespace TeamMngt.Controllers
             }
 
             var pracownik = await _context.Pracownik
-                .Include(p => p.Zadania)
+                .Include(p => p.Zadania.OrderBy(z=>z.Deadline).ThenBy(z=>(double)z.CzasWykonania))
                 .Include(p => p.Zespol)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (pracownik == null)

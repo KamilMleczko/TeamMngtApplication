@@ -40,3 +40,26 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+<h4></h4>
+<h4>Zadania przydzielone pracownikowi:</h4>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Nazwa</th>
+        <th>Deadline</th>
+        <th>Czas Wykonania</th>
+        <th>Opis</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var zadanie in Model.Zadania)
+    {
+        <tr>
+            <td>@zadanie.Nazwa</td>
+            <td>@zadanie.Deadline.ToString()</td> 
+            <td>@zadanie.CzasWykonania</td>
+             <td>@zadanie.Opis</td>
+        </tr>
+    }
+    </tbody>
+</table>

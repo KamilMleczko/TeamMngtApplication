@@ -1,53 +1,66 @@
-@model IEnumerable<TeamMngt.Models.ModulProjektu>
+@model IEnumerable<TeamMngt.MoreClasses.ModulProjektuDetailsViewModel>
 
-@{
-    ViewData["Title"] = "Index";
-}
 
 <h1>Twoje Moduły</h1>
 
 <p>
     <a asp-action="Create">Utwórz nowy Moduł</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nazwa)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DataRozpoczecia)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Deadline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Opis)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nazwa)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DataRozpoczecia)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Deadline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Opis)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@foreach (var projectGroup in Model.GroupBy(m => m.Modul.Projekt?.Nazwa?? "!Brak!")
+              .OrderBy(g => g.Key ))
+{
+    
+    <h2>Przypisany projekt: @projectGroup.Key</h2>  <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Modul.Nazwa)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Modul.DataRozpoczecia)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Modul.Deadline)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Modul.Opis)
+                </th>
+                <th>
+                    Czas na realizacje wszystkich zadań w module
+                </th>
+                
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in projectGroup)
+            {
+                <tr>
+                     <td>
+                                    @Html.DisplayFor(modelItem => item.Modul.Nazwa)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Modul.DataRozpoczecia)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Modul.Deadline)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Modul.Opis)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ŁącznyCzasWykonania)
+                                </td>
+                                
+                                <td>
+                                                <a asp-action="Edit" asp-route-id="@item.Modul.Id">Edit</a> |
+                                                <a asp-action="Details" asp-route-id="@item.Modul.Id">Details</a> |
+                                                <a asp-action="Delete" asp-route-id="@item.Modul.Id">Delete</a>
+                                            </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
 }
-    </tbody>
-</table>
+

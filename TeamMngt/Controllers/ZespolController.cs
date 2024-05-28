@@ -25,6 +25,7 @@ namespace TeamMngt.Controllers
             var zes = _context.Zespol
                 .Include(p => p.ModulProjektu)
                 .Include(p => p.Pracownicy)
+                .OrderBy(p => p.Nazwa)
                 .AsNoTracking();
             return View(await zes.ToListAsync());
         }
@@ -39,7 +40,7 @@ namespace TeamMngt.Controllers
 
             var zespol = await _context.Zespol
                 .Include(p => p.ModulProjektu)
-                .Include(p => p.Pracownicy)
+                .Include(p => p.Pracownicy.OrderBy(pr => pr.Nazwisko).ThenBy(pr => pr.Imie))
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (zespol == null)
             {
