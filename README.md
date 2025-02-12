@@ -27,4 +27,4 @@ Team Management System is a web application built with ASP.NET Core MVC and Enti
 * Restricted access to database-related views for unauthorized users.
 
 ## Database Schema
-
+![image alt](https://github.com/KamilMleczko/TeamMngtApplication/blob/master/database.png?raw=true)
